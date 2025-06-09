@@ -23,7 +23,7 @@ fun get_substitutions1 (lists: string list list, s: string) : string list =
         [] => [] (* no sublists *)
         | list :: rest =>
             case all_except_option(s, list) of
-                NONE => [] (* string not present in current list*)
+                NONE => get_substitutions1(rest, s)
                 | SOME xs => xs @ get_substitutions1(rest, s)
 
 (* you may assume that Num is always used with values 2, 3, ..., 10
