@@ -26,6 +26,26 @@ fun get_substitutions1 (lists: string list list, s: string) : string list =
                 NONE => get_substitutions1(rest, s)
                 | SOME xs => xs @ get_substitutions1(rest, s)
 
+fun get_substitutions2 (lists: string list list, s: string) : string list =
+    let fun rec_helper (lists, acc_list) =
+        case lists of
+            [] => acc_list (* if no more lists, return the acc_list result *)
+            | list :: rest =>
+                case all_except_option(s, list) of
+                    NONE => rec_helper(rest, acc_list)
+                    | SOME xs =>
+                    let
+                        fun build_list (list, acc_list): string list =
+                            case list of
+                                [] => acc_list
+                                | x :: xs => build_list(xs, x :: acc_list)
+                    in
+                        rec_helper(rest, build_list(xs, acc_list)) (* build the acc_list recursively from each item *)
+                end
+    in
+        rec_helper(lists, [])
+    end
+
 (* you may assume that Num is always used with values 2, 3, ..., 10
    though it will not really come up *)
 datatype suit = Clubs | Diamonds | Hearts | Spades
