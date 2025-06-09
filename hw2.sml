@@ -7,6 +7,15 @@ fun same_string(s1 : string, s2 : string) =
     s1 = s2
 
 (* put your solutions for problem 1 here *)
+fun all_except_option (s: string, xs: string list) =
+    case xs of
+        [] => NONE
+        | x :: xs => if same_string(s, x) then
+                        SOME xs
+                     else
+                        case all_except_option(s, xs) of
+                            NONE => NONE
+                            | SOME ys => SOME (x :: ys)
 
 (* you may assume that Num is always used with values 2, 3, ..., 10
    though it will not really come up *)
