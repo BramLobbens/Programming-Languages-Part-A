@@ -46,6 +46,22 @@ fun get_substitutions2 (lists: string list list, s: string) : string list =
         rec_helper(lists, [])
     end
 
+type fullname = { first: string, middle: string, last: string }
+fun similar_names (lists: string list list, fullname: fullname ) =
+    case fullname of
+        { first = f, middle = m, last = l } =>
+            let
+                fun make_fullname (xs: string list) = (* helper to build result with record constructs for eacht list item *)
+                    case xs of
+                        [] => []
+                        | x::xs => [{ first=x, middle=m, last=l }] @ make_fullname(xs)
+            in
+                let val subs = f :: get_substitutions1(lists, f) (* step 1 create a list of substitutions by fullname's first name *)
+                in
+                    make_fullname(subs)
+                end
+            end
+
 (* you may assume that Num is always used with values 2, 3, ..., 10
    though it will not really come up *)
 datatype suit = Clubs | Diamonds | Hearts | Spades
