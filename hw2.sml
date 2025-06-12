@@ -108,4 +108,4 @@ fun remove_card (cs: card list, c: card, e: exn) =
 fun all_same_color [] = false
     | all_same_color (_::[]) = true
     | all_same_color (card1::(card2::tl)) =
-        card_color card1 = card_color card2 andalso all_same_color(tl)
+        card_color card1 = card_color card2 andalso all_same_color(card2::tl)
