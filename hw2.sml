@@ -109,3 +109,26 @@ fun all_same_color [] = false
     | all_same_color (_::[]) = true
     | all_same_color (card1::(card2::tl)) =
         card_color card1 = card_color card2 andalso all_same_color(card2::tl)
+
+fun sum_cards (cards: card list) =
+    let
+        fun helper (cs, acc) =
+            case cs of
+                [] => acc
+                | card::tl => helper (tl, acc + (card_value card))
+    in
+        helper (cards, 0)
+    end
+
+fun score (cards: card list, goal: int): int =
+    let
+        val sum = sum_cards cards
+        val preliminary_score =
+            if sum > goal
+            then 3 * (sum - goal)
+            else goal - sum
+    in
+        if all_same_color cards
+        then preliminary_score div 2
+        else preliminary_score
+    end
