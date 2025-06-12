@@ -120,15 +120,45 @@ fun sum_cards (cards: card list) =
         helper (cards, 0)
     end
 
-fun score (cards: card list, goal: int): int =
+fun score (cards, goal) =
     let
         val sum = sum_cards cards
-        val preliminary_score =
-            if sum > goal
+        val preliminary_score = if sum > goal
             then 3 * (sum - goal)
             else goal - sum
     in
         if all_same_color cards
         then preliminary_score div 2
         else preliminary_score
+    end
+
+fun officiate (cards, moves, goal) =
+    let
+        fun helper (cards', moves', held_cards) =
+            case moves' of
+                [] => score(held_cards, goal)
+                | (move::rest_moves) =>
+                    case move of
+                        Discard(card) =>
+                            let
+                                val new_hand = remove_card(held_cards, card, IllegalMove)
+                            in
+                                helper (cards', rest_moves, new_hand)
+                            end
+                        | Draw =>
+                            let
+                                fun goal_exceeded new_hand = (sum_cards new_hand) > goal
+                            in
+                                case cards' of
+                                    [] => score(held_cards, goal)
+                                    | card::cards'' =>
+                                        let val new_hand = card::held_cards
+                                        in
+                                            if (goal_exceeded new_hand)
+                                            then score(new_hand, goal)
+                                            else helper (cards'', rest_moves, new_hand)
+                                        end
+                            end
+    in
+        helper (cards, moves, [])
     end
