@@ -74,4 +74,38 @@ datatype move = Discard of card | Draw
 exception IllegalMove
 
 (* put your solutions for problem 2 here *)
+fun card_color (suit, _) =
+    case suit of
+        Clubs => Black
+        | Spades => Black
+        | _ => Red
 
+fun card_color2 (Clubs, _) = Black
+    | card_color3 (Spades, _) = Black
+    | card_color3 _ = Red
+
+fun card_value (_, rank) =
+    case rank of
+        Num(i) => i
+        | Ace => 11
+        | _ => 10
+
+fun card_value2 (_, Num(i)) = i
+    | card_value2 (_, Ace) = 11
+    | card_value2 _ = 10
+
+fun remove_card (cs: card list, c: card, e: exn) =
+    let
+        fun helper (xs, acc) =
+        case xs of
+            [] => raise e
+            | x::xs' => if (x = c) then acc @ xs'
+                        else helper (xs', x::acc)
+    in
+       helper (cs, [])
+    end
+
+fun all_same_color [] = false
+    | all_same_color (_::[]) = true
+    | all_same_color (card1::(card2::tl)) =
+        card_color card1 = card_color card2 andalso all_same_color(tl)
