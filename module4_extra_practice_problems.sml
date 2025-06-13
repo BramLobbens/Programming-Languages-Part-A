@@ -33,3 +33,50 @@ fun number_misgraded (list) =
     in
         helper (list, 0)
     end
+
+
+(* 5-7 *)
+datatype 'a tree = leaf
+                 | node of { value : 'a, left : 'a tree, right : 'a tree }
+datatype flag = leave_me_alone | prune_me
+
+fun tree_height tree =
+    let fun help (leaf, acc) = acc
+            | help (node { value, left, right }, acc) =
+                1 + Int.max (help (left, acc), help (right, acc))
+    in
+        help (tree, 0)
+    end
+
+(* fun tree_height leaf = 0
+    | tree_height (node { value, left, right }) =
+        1 + Int.max (tree_height left, tree_height right) *)
+
+fun sum_tree (tree: int tree) =
+    let fun help (leaf, acc) = acc
+        | help (node { value, left, right }, acc) =
+            help (left, help (right, acc + value))
+    in
+        help (tree, 0)
+    end
+
+fun gardener (tree: flag tree) =
+    case tree of
+        leaf => leaf
+        | node { value, left, right } =>
+            case value of
+                prune_me => leaf
+                | leave_me_alone => node {
+                    value=leave_me_alone,
+                    left=gardener left,
+                    right=gardener right
+                    }
+
+fun gardener2 leaf = leaf
+    | gardener2 (node { value = prune_me, left, right }) = leaf
+    | gardener2 (node { value = leave_me_alone, left, right  }) =
+        node {
+            value = leave_me_alone,
+            left = gardener2 left,
+            right = gardener2 right
+        }
