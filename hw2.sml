@@ -7,7 +7,7 @@ fun same_string(s1 : string, s2 : string) =
     s1 = s2
 
 (* put your solutions for problem 1 here *)
-fun all_except_option (s: string, xs: string list) : string list option =
+fun all_except_option (s: string, xs: string list) =
     case xs of
         [] => NONE
         | x :: xs =>
@@ -18,7 +18,7 @@ fun all_except_option (s: string, xs: string list) : string list option =
                     NONE => NONE
                     | SOME ys => SOME (x :: ys)
 
-fun get_substitutions1 (lists: string list list, s: string) : string list =
+fun get_substitutions1 (lists: string list list, s: string) =
     case lists of
         [] => [] (* no sublists *)
         | list :: rest =>
@@ -26,7 +26,7 @@ fun get_substitutions1 (lists: string list list, s: string) : string list =
                 NONE => get_substitutions1(rest, s)
                 | SOME xs => xs @ get_substitutions1(rest, s)
 
-fun get_substitutions2 (lists: string list list, s: string) : string list =
+fun get_substitutions2 (lists: string list list, s: string) =
     let fun rec_helper (lists, acc_list) =
         case lists of
             [] => acc_list (* if no more lists, return the acc_list result *)
@@ -35,7 +35,7 @@ fun get_substitutions2 (lists: string list list, s: string) : string list =
                     NONE => rec_helper(rest, acc_list)
                     | SOME xs =>
                     let
-                        fun build_list (list, acc_list): string list =
+                        fun build_list (list, acc_list) =
                             case list of
                                 [] => acc_list
                                 | x :: xs => build_list(xs, x :: acc_list)
@@ -80,32 +80,24 @@ fun card_color (suit, _) =
         | Spades => Black
         | _ => Red
 
-fun card_color2 (Clubs, _) = Black
-    | card_color3 (Spades, _) = Black
-    | card_color3 _ = Red
-
 fun card_value (_, rank) =
     case rank of
         Num(i) => i
         | Ace => 11
         | _ => 10
 
-fun card_value2 (_, Num(i)) = i
-    | card_value2 (_, Ace) = 11
-    | card_value2 _ = 10
-
 fun remove_card (cs: card list, c: card, e: exn) =
     let
         fun helper (xs, acc) =
-        case xs of
-            [] => raise e
-            | x::xs' => if (x = c) then acc @ xs'
-                        else helper (xs', x::acc)
+            case xs of
+                [] => raise e
+                | x::xs' => if (x = c) then acc @ xs'
+                            else helper (xs', x::acc)
     in
-       helper (cs, [])
+        helper (cs, [])
     end
 
-fun all_same_color [] = false
+fun all_same_color [] = true
     | all_same_color (_::[]) = true
     | all_same_color (card1::(card2::tl)) =
         card_color card1 = card_color card2 andalso all_same_color(card2::tl)
@@ -124,8 +116,8 @@ fun score (cards, goal) =
     let
         val sum = sum_cards cards
         val preliminary_score = if sum > goal
-            then 3 * (sum - goal)
-            else goal - sum
+                                then 3 * (sum - goal)
+                                else goal - sum
     in
         if all_same_color cards
         then preliminary_score div 2
