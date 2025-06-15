@@ -68,3 +68,20 @@ val longest_capitalized = longest_string3 o only_capitals
 reverse order. Use ML’s o operator, the library function rev for reversing lists, and two library functions
 in the String module. (Browse the module documentation to find the most useful functions.) *)
 val rev_string = String.implode o List.rev o String.explode
+
+(* 7. Write a function first_answer of type (’a -> ’b option) -> ’a list -> ’b (notice the 2 argu-
+ments are curried). The first argument should be applied to elements of the second argument in order
+until the first time it returns SOME v for some v and then v is the result of the call to first_answer.
+If the first argument returns NONE for all list elements, then first_answer should raise the exception
+NoAnswer. Hints: Sample solution is 5 lines and does nothing fancy. *)
+fun first_answer f =
+	let
+		fun loop xs =
+			case xs of
+				[] => raise NoAnswer
+				| (x::tl) => case f x of
+								SOME v => v
+								| NONE => loop tl
+	in
+		(fn list => loop list)
+	end
