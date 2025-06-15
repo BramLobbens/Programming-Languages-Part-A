@@ -3,36 +3,36 @@
 exception NoAnswer
 
 datatype pattern = Wildcard
-		 | Variable of string
-		 | UnitP
-		 | ConstP of int
-		 | TupleP of pattern list
-		 | ConstructorP of string * pattern
+         | Variable of string
+         | UnitP
+         | ConstP of int
+         | TupleP of pattern list
+         | ConstructorP of string * pattern
 
 datatype valu = Const of int
-	      | Unit
-	      | Tuple of valu list
-	      | Constructor of string * valu
+          | Unit
+          | Tuple of valu list
+          | Constructor of string * valu
 
 fun g f1 f2 p =
     let
-	val r = g f1 f2
+    val r = g f1 f2
     in
-	case p of
-	    Wildcard          => f1 ()
-	  | Variable x        => f2 x
-	  | TupleP ps         => List.foldl (fn (p,i) => (r p) + i) 0 ps
-	  | ConstructorP(_,p) => r p
-	  | _                 => 0
+    case p of
+        Wildcard          => f1 ()
+      | Variable x        => f2 x
+      | TupleP ps         => List.foldl (fn (p,i) => (r p) + i) 0 ps
+      | ConstructorP(_,p) => r p
+      | _                 => 0
     end
 
 (**** for the challenge problem only ****)
 
 datatype typ = Anything
-	     | UnitT
-	     | IntT
-	     | TupleT of typ list
-	     | Datatype of string
+         | UnitT
+         | IntT
+         | TupleT of typ list
+         | Datatype of string
 
 (**** you can put all your code here ****)
 
@@ -54,7 +54,7 @@ val longest_string2 = foldl (fn (x,y) => if String.size x >= String.size y then 
 (* 4. Write functions longest_string_helper, longest_string3, and longest_string4 such that [...] *)
 (*  (int * int -> bool) -> string list -> string  *)
 fun longest_string_helper predicate =
-	foldl (fn (x,y) => if predicate (String.size x, String.size y) then x else y) ""
+    foldl (fn (x,y) => if predicate (String.size x, String.size y) then x else y) ""
 val longest_string3 = longest_string_helper (fn (x,y) => x > y)
 val longest_string4 = longest_string_helper (fn (x,y) => x >= y)
 
@@ -74,14 +74,48 @@ ments are curried). The first argument should be applied to elements of the seco
 until the first time it returns SOME v for some v and then v is the result of the call to first_answer.
 If the first argument returns NONE for all list elements, then first_answer should raise the exception
 NoAnswer. Hints: Sample solution is 5 lines and does nothing fancy. *)
+(* fun first_answer f =
+    let
+        fun loop list =
+            case list of
+                [] => raise NoAnswer
+              | (x::xs) => case f x of
+                                SOME v => v
+                              | NONE => loop xs
+    in
+        loop
+    end *)
+
+(* fun first_answer2 f = fn xs =>
+    case xs of
+        [] => raise NoAnswer
+      | x::xs' => case f x of
+                        SOME v => v
+                      | NONE => first_answer2 f xs' *)
+
 fun first_answer f =
-	let
-		fun loop xs =
-			case xs of
-				[] => raise NoAnswer
-				| (x::tl) => case f x of
-								SOME v => v
-								| NONE => loop tl
-	in
-		(fn list => loop list)
-	end
+    fn [] => raise NoAnswer
+      | x::xs' => case f x of
+                    SOME v => v
+                  | NONE => first_answer f xs'
+
+
+(* 8. Write a function all_answers of type (’a -> ’b list option) -> ’a list -> ’b list option
+(notice the 2 arguments are curried). The first argument should be applied to elements of the second
+argument. If it returns NONE for any element, then the result for all_answers is NONE. Else the
+calls to the first argument will have produced SOME lst1, SOME lst2, ... SOME lstn and the result of
+all_answers is SOME lst where lst is lst1, lst2, ..., lstn appended together (order doesn’t matter).
+Hints: The sample solution is 8 lines. It uses a helper function with an accumulator and uses @. Note
+all_answers f [] should evaluate to SOME [] *)
+fun all_answers f =
+    let
+        fun loop (list', acc) =
+            case list' of
+                [] => SOME acc
+                | x::xs => case f x of
+                           SOME lst => loop (xs, lst @ acc)
+                         | NONE => NONE
+    in
+        fn list => loop (list, [])
+    end
+
