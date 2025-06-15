@@ -4,13 +4,13 @@ type grade = int (* must be in 0 to 100 range *)
 type final_grade = { id : student_id, grade : grade option }
 datatype pass_fail = pass | fail
 
-fun pass_or_fail ({grade=SOME(i), id=_}) =
+fun pass_or_fail {grade=SOME i, id=_} =
         if i >= 75 then pass else fail
     | pass_or_fail _ = fail
 
 fun has_passed grade = pass_or_fail grade = pass
 
-fun number_passed (final_grades) =
+fun number_passed final_grades =
     let
         fun helper ([], acc) = acc
             | helper (x::xs, acc) =
@@ -22,7 +22,7 @@ fun number_passed (final_grades) =
         helper (final_grades, 0)
     end
 
-fun number_misgraded (list) =
+fun number_misgraded list =
     let
         fun helper ([], acc) = acc
             | helper ((result, grade)::tl, acc) =
@@ -42,7 +42,7 @@ datatype flag = leave_me_alone | prune_me
 
 fun tree_height tree =
     let fun help (leaf, acc) = acc
-            | help (node { value, left, right }, acc) =
+            | help (node { value = _, left, right }, acc) =
                 1 + Int.max (help (left, acc), help (right, acc))
     in
         help (tree, 0)
@@ -73,7 +73,7 @@ fun gardener (tree: flag tree) =
                     }
 
 fun gardener2 leaf = leaf
-    | gardener2 (node { value = prune_me, left, right }) = leaf
+    | gardener2 (node { value = prune_me, left = _, right = _ }) = leaf
     | gardener2 (node { value = leave_me_alone, left, right  }) =
         node {
             value = leave_me_alone,
