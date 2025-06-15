@@ -119,3 +119,35 @@ fun all_answers f =
         fn list => loop (list, [])
     end
 
+(* 9. (a) Use g to define a function count_wildcards that takes a pattern and returns how many Wildcard
+patterns it contains. *)
+val count_wildcards = g (fn () => 1) (fn _ => 0) (* dummy f2*)
+
+(* 9. (b) Use g to define a function count_wild_and_variable_lengths that takes a pattern and returns
+the number of Wildcard patterns it contains plus the sum of the string lengths of all the variables
+in the variable patterns it contains. (Use String.size. We care only about variable names; the
+constructor names are not relevant.) *)
+val count_wild_and_variable_lengths = g (fn () => 1) String.size
+
+(* 9. (c) Use g to define a function count_some_var that takes a string and a pattern (as a pair) and
+returns the number of times the string appears as a variable in the pattern. We care only about
+variable names; the constructor names are not relevant. *)
+fun count_some_var (s, p) =
+    g (fn () => 0) (fn y => if (y = s) then 1 else 0) p
+
+(* 10. Write a function check_pat that takes a pattern and returns true if and only if all the variables
+appearing in the pattern are distinct from each other (i.e., use different strings).
+[...] *)
+fun check_pat p =
+ let
+    fun variables_list (p, acc) =
+        case p of
+          Variable x        => x::acc
+        | TupleP ps         => List.foldl (fn (p',acc') => (variables_list (p', acc'))) [] ps
+        | ConstructorP(_,p') => variables_list (p', acc)
+        | _                 => acc
+    fun contains_duplicates [] = true
+        | contains_duplicates (x::xs) = List.exists (fn y => y = x) xs
+ in
+    not (contains_duplicates (variables_list(p, [])))
+ end
