@@ -76,4 +76,6 @@ val test117 =
   match (Constructor("same", Const 1), ConstructorP("same", Variable "test117")) = SOME[("test117", Const 1)]
 
 val test12 = first_match Unit [UnitP] = SOME []
-
+val test121 = first_match Unit [] = NONE
+val test122 = first_match (Tuple[Const 1, Const 2]) [UnitP, ConstP 5, TupleP[ConstP 1, ConstP 2]] = SOME []
+val test123 = first_match (Constructor("same", Const 1)) [UnitP, ConstructorP("same", Variable "test123")] = SOME[("test123", Const 1)]
