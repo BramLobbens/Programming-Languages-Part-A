@@ -151,3 +151,21 @@ fun check_pat p =
  in
     not (contains_duplicates (variables_list(p, [])))
  end
+
+
+(* 11. Write a function match that takes a valu * pattern and returns a (string * valu) list option,
+namely NONE if the pattern does not match and SOME lst where lst is the list of bindings if it does.
+Note that if the value matches but the pattern has no patterns of the form Variable s, then the result
+is SOME []. [...].*)
+(* valu * pattern -> (string * valu) list option *)
+fun match (v: valu, p: pattern) : (string * valu) list option =
+    case (v, p) of
+        (_, Wildcard) => SOME []
+      | (v', Variable s) => SOME [(s,v')]
+      | (Unit, UnitP) => SOME []
+      | (Const _, ConstP _) => SOME []
+      | (Tuple vs, TupleP ps) => all_answers (fn (v', p') => match (v', p')) (ListPair.zip (vs, ps))
+      | (Constructor(s1,v1), ConstructorP(s2,p2)) => if s1 = s2
+                                                     then match (v1, p2)
+                                                     else NONE
+      | _ => NONE
