@@ -4,7 +4,7 @@
 (* All the tests should evaluate to true. For example, the REPL should say: val test1 = true : bool *)
 
 val test1 = only_capitals ["A","B","C"] = ["A","B","C"]
-val test11 = only_capitals ["a","Bb","C"] = ["Bb","C"]
+val test01 = only_capitals ["a","Bb","C"] = ["Bb","C"]
 
 val test2 = longest_string1 ["A","bc","C"] = "bc"
 val test21 = longest_string1 ["A","bc","cc","C"] = "bc"
@@ -74,6 +74,9 @@ val test116 =
   match (Tuple[Const 1, Const 2, Unit], TupleP[ConstP 1, Variable "a", Variable "b"]) = SOME [("b", Unit),("a", Const 2)]
 val test117 =
   match (Constructor("same", Const 1), ConstructorP("same", Variable "test117")) = SOME[("test117", Const 1)]
+val test118 = match (Const 17,ConstP 4) = NONE
+val test119 = match (Tuple[Const 17,Unit,Const 4,Constructor ("egg",Const 4),Constructor ("egg",Constructor ("egg",Const 4))],
+                                                   TupleP[Wildcard,Wildcard]) = NONE
 
 val test12 = first_match Unit [UnitP] = SOME []
 val test121 = first_match Unit [] = NONE

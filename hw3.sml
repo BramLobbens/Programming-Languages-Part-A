@@ -163,8 +163,10 @@ fun match (v: valu, p: pattern) : (string * valu) list option =
         (_, Wildcard) => SOME []
       | (v', Variable s) => SOME [(s,v')]
       | (Unit, UnitP) => SOME []
-      | (Const _, ConstP _) => SOME []
-      | (Tuple vs, TupleP ps) => all_answers (fn (v', p') => match (v', p')) (ListPair.zip (vs, ps))
+      | (Const i1, ConstP i2) => if i1 = i2 then SOME [] else NONE
+      | (Tuple vs, TupleP ps) => if List.length vs = List.length ps
+                                 then all_answers (fn (v', p') => match (v', p')) (ListPair.zip (vs, ps))
+                                 else NONE
       | (Constructor(s1,v1), ConstructorP(s2,p2)) => if s1 = s2
                                                      then match (v1, p2)
                                                      else NONE
