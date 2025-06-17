@@ -1,3 +1,7 @@
+(**
+Type inference (polymorphic example)
+**)
+
 fun compose (f,g) = fn x => f (g x)
 
 (*
@@ -30,3 +34,20 @@ this function returns a function that takes a c' (to apply to the function g)
     ... the output of g will be applied to f
     the output of that f b' is the output b' of the compose
 *)
+
+(**
+value restriction
+**)
+
+(* ...won't type check: *)
+(*  The right‑hand side runs code (it is a function application),
+so the compiler treats it as expansive *)
+val foo = List.map (fn x => (x,1))
+(* ...but this will *)
+(* – Here the right‑hand side is just a λ‑expression,
+fn xs => …, which is non‑expansive. *)
+val foo = fn xs => (List.map (fn x => (x,1))) xs
+fun foo xs = List.map (fn x => (x,1)) xs
+
+(* Non‑expansive (just a value) *)
+(* Expansive (does some computation) *)
