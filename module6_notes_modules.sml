@@ -29,8 +29,19 @@ end
 
 signature RATIONAL_B =
 sig
-    type rational (* solution: type exposed, but not its definition *)
+    type rational (* solution: type exposed, but not its definition  = abstract type *)
     exception BadFrac
+    val make_frac : int * int -> rational
+    val add : rational * rational -> rational
+    val toString : rational -> string
+end
+
+signature RATIONAL_C =
+sig
+    type rational
+    exception BadFrac
+    val Whole : int -> rational (* exposing Whole wouldn't cause any issues for our invariant constraints,
+                                and can actually export it as a function that returns a rational! *)
     val make_frac : int * int -> rational
     val add : rational * rational -> rational
     val toString : rational -> string
