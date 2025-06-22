@@ -133,3 +133,21 @@
       ([even? (lambda (x) (if (zero? x) #t (odd? (- x 1))))]
        [odd? (lambda (x) (if (zero? x) #f (even? (- x 1))))])
     (if (even? x) 0 1)))
+
+
+;; mutation
+
+;set! (set-bang)
+(define b 3)
+(define f (lambda (x) (* 1 (+ x b))))
+(define c (+ b 4)) ;7
+(set! b 5)
+(define z (f 4)) ;9 -current value in environment that b takes is 5
+(define w c) ;7 -unchanged
+
+;begin
+(define some-x (begin
+                 (+ 5 3)
+                 (* 3 8)
+                 (- 3 2) ; When using the begin special form, the result of the final expression is the returned value
+                 ))
