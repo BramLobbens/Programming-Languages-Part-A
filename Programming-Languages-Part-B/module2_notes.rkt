@@ -151,3 +151,55 @@
                  (* 3 8)
                  (- 3 2) ; When using the begin special form, the result of the final expression is the returned value
                  ))
+
+;mcons
+(define mpr (mcons 10 (mcons 3 (mcons "yay" "test"))))
+(set-mcar! mpr 30)
+(set-mcdr! mpr (mcons 5 null))
+(length mpr) ; will not work - mcons does not produce a 'proper list'
+
+
+;; Delayed Evaluation
+
+;arguments of functions get evaluated before calling the function
+;if/cond only evaluates the branch that it needs to
+
+;if you would want to emulate if via a wrapper function:
+;e2 and e3 should be zero argument functions (delays evaluation)
+(define (my-if-strange-but-works e1 e2 e3)
+  (if e1 (e2) (e3)))
+
+(define (factorial-okay x)
+  (my-if-strange-but-works
+   (= x 0)
+   (lambda () 1)
+   (lambda () (* x (factorial-okay (- x 1))))))
+;Wrapping the expression in a lambda function delays evaluation, which is what it means to thunk an expression.
+
+(define (my-force p)
+  (if (mcar p)
+     (mcdr p)
+     (begin (set-mcar! p #t)
+           (set-mcdr! p ((mcdr p)))
+           (mcdr p))))
+
+
+;; Streams
+
+; A stream is an infinite sequence of values
+; key idea: use a thunk to delay creating most of the sequence
+
+; let a stream be a thunk that when called returns a pair:
+;-- '(next-anser . next-thunk)
+; given a stream st, the client can get any number of elements
+;-- first: (car (s))
+;--second: (car ((cdr (s))))
+;--third: (car ((cdr ((cdr (s))))))
+;usually bind (cdr (s)) to a variable or pass to a recursive function
+(define (number-until stream tester)
+  (letrec ([f (lambda (stream ans)
+                (let ([pr (stream)]) ; let pr be the pair of thunking the stream
+                  (if (tester (car pr)) ; get the result from the car of the pair
+                     ans
+                     (f (cdr pr) (+ ans 1)))))]) ; call f with the stream of the pair and accumulate onto ans
+    (f stream 1)))
