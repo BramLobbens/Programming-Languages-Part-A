@@ -156,7 +156,7 @@
 (define mpr (mcons 10 (mcons 3 (mcons "yay" "test"))))
 (set-mcar! mpr 30)
 (set-mcdr! mpr (mcons 5 null))
-(length mpr) ; will not work - mcons does not produce a 'proper list'
+;(length mpr) ; will not work - mcons does not produce a 'proper list'
 
 
 ;; Delayed Evaluation
@@ -203,3 +203,38 @@
                      ans
                      (f (cdr pr) (+ ans 1)))))]) ; call f with the stream of the pair and accumulate onto ans
     (f stream 1)))
+
+;defining a stream of ones
+(define ones (lambda () (cons 1 ones)))
+;more verbose - unecessary function wrapping, but equivalent
+(define ones2 (lambda () (cons 1 (lambda () (ones2)))))
+; but careful, not returning a thunk will cause an infinite loop !
+;;(define ones-bad (lambda () (cons 1 (ones-bad))))
+
+;defining a stream of increasing natural numbers
+;e.g. define a func that starts at x and returns a pair starting at x and the recursion on that function +1
+(define (somefunc x) (cons x (lambda () (somefunc (+ x 1)))))
+(define nats_v1 (lambda () (f 1))) ; natural numbers uses this then to start at 1
+
+;better style as a helper function
+(define nats
+  (letrec ([f (lambda (x) (cons x (lambda () (f (+ x 1)))))])
+    (lambda () (f 1))))
+
+
+;; Memoization
+
+(define fibonacci3
+  (letrec ([memo null] ; list of pairs (arg . result) - It is essential that memo is bound outside of the recursive function
+           [f (lambda (x)
+                (let ([ans (assoc x memo)])
+                  (if ans
+                     (cdr ans)
+                     (let ([new-ans (if (or (= x 1) (= x 2))
+                                       1
+                                       (+ (f (- x 1))
+                                         (f (- x 2))))])
+                       (begin
+                         (set! memo (cons (cons x new-ans) memo))
+                         new-ans)))))])
+    f))
