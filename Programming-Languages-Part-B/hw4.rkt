@@ -39,9 +39,9 @@ You can test your streams with this function instead of the graphics code.)|#
 (define (stream-for-n-steps s n)
   (let ([pr (s)])
     (cond
-      [(or (zero? n) (null? (car pr)))
-       (quote ())]
-      [else (cons (car pr) (stream-for-n-steps (cdr pr) (sub1 n)))])))
+      [(or (zero? n) (null? pr)) (quote ())]
+      [else (cons (car pr)
+                 (stream-for-n-steps (cdr pr) (sub1 n)))])))
 
 #|(5. Write a stream funny-number-stream that is like the stream of natural numbers (i.e., 1, 2, 3, ...)
 except numbers divisble by 5 are negated (i.e., 1, 2, 3, 4, -5, 6, 7, 8, 9, -10, 11, ...). Remember a stream
@@ -81,3 +81,41 @@ with place-repeatedly.)|#
             (lambda (s) (let ([pr (s)])
                           (cons (cons 0 (car pr)) (lambda () (recurse (cdr pr))))))])
     (lambda () (recurse s))))
+
+#|(8. Write a function cycle-lists that takes two lists xs and ys and returns a stream. The lists may or
+may not be the same length, but assume they are both non-empty. The elements produced by the
+stream are pairs where the first part is from xs and the second part is from ys. The stream cycles
+forever through the lists.)|#
+; (define (cycle-lists xs ys)
+;   (letrec ([recurse
+;             (lambda (xs ys)
+;               (cond [(or (null? xs) (null? ys)) (quote ())]
+;                    [else (cons (cons (car xs) (car ys)) (lambda () (recurse (cdr xs) (cdr ys))))])
+;               )])
+;     (lambda () (recurse xs ys))))
+
+(define (cycle-lists xs ys)
+  (define (recurse n)
+    (let ([x (list-nth-mod xs n)]
+          [y (list-nth-mod ys n)])
+      (cons (cons x y)
+           (lambda () (recurse (+ n 1))))))
+  (lambda () (recurse 0)))
+
+#|(9. Write a function vector-assoc that takes a value v and a vector vec. It should behave like Racket’s
+assoc library function except (1) it processes a vector (Racket’s name for an array) instead of a list,
+(2) it allows vector elements not to be pairs in which case it skips them, and (3) it always takes exactly
+two arguments. Process the vector elements in order starting from 0. You must use library functions
+vector-length, vector-ref, and equal?. Return #f if no vector element is a pair with a car field
+equal to v, else return the first pair with an equal car field. Sample solution is 9 lines, using one local
+recursive helper function.)|#
+(define (vector-assoc v vec)
+  (letrec ([vec-length (vector-length vec)]
+           [recurse
+            (lambda (i)
+              (let ([vec-ref (vector-ref vec i)])
+                (cond
+                  [(or (null? vec) (>= i vec-length)) #f]
+                  [(and (pair? vec-ref) (equal? (car vec-ref) v)) vec-ref]
+                  [else (recurse (+ i 1))])))])
+    (recurse 0)))
