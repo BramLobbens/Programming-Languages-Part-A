@@ -110,12 +110,13 @@ vector-length, vector-ref, and equal?. Return #f if no vector element is a pair 
 equal to v, else return the first pair with an equal car field. Sample solution is 9 lines, using one local
 recursive helper function.)|#
 (define (vector-assoc v vec)
-  (letrec ([vec-length (vector-length vec)]
-           [recurse
-            (lambda (i)
-              (let ([vec-ref (vector-ref vec i)])
-                (cond
-                  [(or (null? vec) (>= i vec-length)) #f]
-                  [(and (pair? vec-ref) (equal? (car vec-ref) v)) vec-ref]
-                  [else (recurse (+ i 1))])))])
-    (recurse 0)))
+  (let ([vec-length (vector-length vec)])
+    (if (zero? vec-length)
+       #f
+       (letrec ([recurse (lambda (i)
+                           (let ([vec-ref (vector-ref vec i)])
+                             (cond
+                               [(>= i vec-length) #f]
+                               [(and (pair? vec-ref) (equal? (car vec-ref) v)) vec-ref]
+                               [else (recurse (+ i 1))])))])
+         (recurse 0)))))
