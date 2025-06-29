@@ -130,23 +130,16 @@ used-and-possibly-mutated each time the function returned by cached-assoc is cal
 positive.)|#
 (define (cached-assoc xs n)
   (letrec ([vector-cache (make-vector n #f)]
-           [cache-i 0]
-           [recurse
-            (lambda (xs v)
-              (if (null? xs)
-                 #f
-                 (let ([res (vector-assoc v vector-cache)])
-                   (if res
-                      res ;found in cache
-                      (let ([new-res (assoc v xs)])
-                        (if new-res
-                           (begin
-                             ;(printf "cache-i is ~v \n" cache-i)
-                             (vector-set! vector-cache cache-i new-res)
-                             ;(printf "vector-cache is now ~v \n" vector-cache)
-                             (set! cache-i (add1 cache-i))
-                             ;(printf "updated cache-i is now ~v \n" cache-i)
-                             new-res)
-                           (recurse (cdr xs) v)
-                           ))))))])
-    (lambda (v) (recurse xs v))))
+           [cache-i 0])
+    (lambda (v)
+      (let ([res (vector-assoc v vector-cache)])
+        (if res
+           res ;found in cache
+           (let ([new-res (assoc v xs)])
+             (if new-res
+                (begin
+                  (vector-set! vector-cache cache-i new-res)
+                  (set! cache-i (add1 cache-i))
+                  new-res)
+                #f
+                )))))))
