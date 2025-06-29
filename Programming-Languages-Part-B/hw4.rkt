@@ -143,3 +143,16 @@ positive.)|#
                   new-res)
                 #f
                 )))))))
+
+#|(11. (Challenge Problem:) Define a macro that is used like (while-less e1 do e2) where e1 and e2
+are expressions and while-less and do are syntax (keywords).)|#
+(define-syntax while-less
+  (syntax-rules (do)
+    [(while-less e1 do e2)
+     (letrec ([ev1 e1]
+              [recurse (lambda ()
+                         (cond
+                           [(>= e2 ev1) #t]
+                           [else (recurse)]
+                           ))])
+       (recurse))]))
