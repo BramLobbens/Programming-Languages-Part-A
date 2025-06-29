@@ -114,9 +114,39 @@ recursive helper function.)|#
     (if (zero? vec-length)
        #f
        (letrec ([recurse (lambda (i)
-                           (let ([vec-ref (vector-ref vec i)])
-                             (cond
-                               [(>= i vec-length) #f]
-                               [(and (pair? vec-ref) (equal? (car vec-ref) v)) vec-ref]
-                               [else (recurse (+ i 1))])))])
+                           (if (>= i vec-length) #f
+                              (let ([vec-ref (vector-ref vec i)])
+                                (cond
+                                  [(and (pair? vec-ref) (equal? (car vec-ref) v)) vec-ref]
+                                  [else (recurse (+ i 1))]))))])
          (recurse 0)))))
+
+#|(10. Write a function cached-assoc that takes a list xs and a number n and returns a function that takes
+one argument v and returns the same thing that (assoc v xs) would return. However, you should
+use an n-element cache of recent results to possibly make this function faster than just calling assoc
+(if xs is long and a few elements are returned often). The cache must be a Racket vector of length n
+that is created by the call to cached-assoc (use Racket library function vector or make-vector) and
+used-and-possibly-mutated each time the function returned by cached-assoc is called. Assume n is
+positive.)|#
+(define (cached-assoc xs n)
+  (letrec ([vector-cache (make-vector n #f)]
+           [cache-i 0]
+           [recurse
+            (lambda (xs v)
+              (if (null? xs)
+                 #f
+                 (let ([res (vector-assoc v vector-cache)])
+                   (if res
+                      res ;found in cache
+                      (let ([new-res (assoc v xs)])
+                        (if new-res
+                           (begin
+                             ;(printf "cache-i is ~v \n" cache-i)
+                             (vector-set! vector-cache cache-i new-res)
+                             ;(printf "vector-cache is now ~v \n" vector-cache)
+                             (set! cache-i (add1 cache-i))
+                             ;(printf "updated cache-i is now ~v \n" cache-i)
+                             new-res)
+                           (recurse (cdr xs) v)
+                           ))))))])
+    (lambda (v) (recurse xs v))))
