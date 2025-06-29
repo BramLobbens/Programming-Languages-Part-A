@@ -129,8 +129,8 @@ that is created by the call to cached-assoc (use Racket library function vector 
 used-and-possibly-mutated each time the function returned by cached-assoc is called. Assume n is
 positive.)|#
 (define (cached-assoc xs n)
-  (letrec ([vector-cache (make-vector n #f)]
-           [cache-i 0])
+  (let ([vector-cache (make-vector n #f)]
+        [cache-i 0])
     (lambda (v)
       (let ([res (vector-assoc v vector-cache)])
         (if res
